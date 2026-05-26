@@ -1,51 +1,907 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Dashboard</title>
-    <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }
-        .card { border: 1px solid #ccc; padding: 15px; border-radius: 6px; }
-        .card h3 { margin-top: 0; }
-        .card a { text-decoration: none; color: #0366d6; font-weight: bold; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Joseph Araril — projects & experiments" />
+  <title>Joseph Araril — Projects</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ---------- Tokens ---------- */
+    :root {
+      --font-sans: "Geist", ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      --font-serif: "Instrument Serif", ui-serif, Georgia, serif;
+
+      --radius-sm: 6px;
+      --radius:    10px;
+      --radius-lg: 14px;
+
+      --ease: cubic-bezier(.2, .8, .2, 1);
+    }
+
+    html[data-theme="dark"] {
+      --bg:          #0a0a0a;
+      --bg-elev:     #0f0f0f;
+      --surface:     #111111;
+      --surface-2:   #161616;
+      --border:      #1f1f1f;
+      --border-strong:#2a2a2a;
+      --text:        #ededed;
+      --text-muted:  #8a8a8a;
+      --text-faint:  #5a5a5a;
+      --accent:      #ffffff;
+      --accent-dim:  #d4d4d4;
+      --launch:      #ededed;
+      --launch-fg:   #0a0a0a;
+      --danger:      #f87171;
+      --grid-line:   rgba(255,255,255,0.04);
+      --skeleton-a:  #161616;
+      --skeleton-b:  #222222;
+      --kbd-bg:      #181818;
+    }
+
+    html[data-theme="light"] {
+      --bg:          #fafafa;
+      --bg-elev:     #ffffff;
+      --surface:     #ffffff;
+      --surface-2:   #f4f4f4;
+      --border:      #e6e6e6;
+      --border-strong:#d4d4d4;
+      --text:        #0a0a0a;
+      --text-muted:  #6b6b6b;
+      --text-faint:  #a0a0a0;
+      --accent:      #0a0a0a;
+      --accent-dim:  #333333;
+      --launch:      #0a0a0a;
+      --launch-fg:   #ffffff;
+      --danger:      #dc2626;
+      --grid-line:   rgba(0,0,0,0.04);
+      --skeleton-a:  #ececec;
+      --skeleton-b:  #f6f6f6;
+      --kbd-bg:      #f0f0f0;
+    }
+
+    /* ---------- Reset / base ---------- */
+    *,*::before,*::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-sans);
+      font-feature-settings: "ss01", "ss02", "cv11";
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      min-height: 100vh;
+      transition: background-color .25s var(--ease), color .25s var(--ease);
+      background-image:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 56px 56px;
+      background-position: -1px -1px;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+    input { font: inherit; color: inherit; }
+    ::selection { background: var(--accent); color: var(--bg); }
+
+    /* ---------- Layout shell ---------- */
+    .shell {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px 28px 96px;
+    }
+    @media (min-width: 768px) {
+      .shell { padding: 48px 40px 120px; }
+    }
+    @media (min-width: 1600px) {
+      .shell { max-width: 1640px; padding: 56px 64px 160px; }
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 64px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.02em;
+      color: var(--text-muted);
+    }
+    .brand .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #3ecf8e;
+      box-shadow: 0 0 0 3px rgba(62,207,142,0.15);
+    }
+    .topbar-actions { display: flex; align-items: center; gap: 8px; }
+
+    .icon-btn {
+      width: 36px; height: 36px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      border: 1px solid transparent;
+      transition: background-color .15s var(--ease), color .15s var(--ease), border-color .15s var(--ease);
+    }
+    .icon-btn:hover {
+      background: var(--surface-2);
+      color: var(--text);
+      border-color: var(--border);
+    }
+    .icon-btn svg { width: 16px; height: 16px; }
+
+    /* ---------- Header / hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
+      margin-bottom: 56px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid var(--border);
+    }
+    @media (min-width: 720px) {
+      .hero { grid-template-columns: auto 1fr auto; gap: 28px; align-items: end; }
+    }
+
+    .avatar {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .avatar .fallback {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 24px;
+      color: var(--text-muted);
+    }
+
+    .hero-text .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: 12px;
+    }
+    .hero-text h1 {
+      margin: 0 0 10px;
+      font-size: clamp(32px, 4.5vw, 52px);
+      font-weight: 500;
+      letter-spacing: -0.025em;
+      line-height: 1.05;
+    }
+    .hero-text h1 .accent {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+    .hero-text p {
+      margin: 0;
+      color: var(--text-muted);
+      max-width: 52ch;
+      font-size: 15px;
+    }
+
+    .hero-links {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .ghost-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 13px;
+      transition: all .15s var(--ease);
+    }
+    .ghost-link:hover {
+      border-color: var(--border-strong);
+      background: var(--surface-2);
+      transform: translateY(-1px);
+    }
+    .ghost-link svg { width: 14px; height: 14px; }
+
+    /* ---------- Toolbar (search + filters) ---------- */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .search {
+      position: relative;
+      flex: 1 1 260px;
+      max-width: 420px;
+    }
+    .search svg.icon {
+      position: absolute;
+      left: 12px; top: 50%; transform: translateY(-50%);
+      width: 14px; height: 14px;
+      color: var(--text-faint);
+      pointer-events: none;
+    }
+    .search input {
+      width: 100%;
+      height: 38px;
+      padding: 0 56px 0 36px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+      transition: border-color .15s var(--ease), background-color .15s var(--ease);
+    }
+    .search input::placeholder { color: var(--text-faint); }
+    .search input:focus { border-color: var(--border-strong); background: var(--surface-2); }
+    .search kbd {
+      position: absolute;
+      right: 8px; top: 50%; transform: translateY(-50%);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-faint);
+      background: var(--kbd-bg);
+      border: 1px solid var(--border);
+      padding: 2px 6px;
+      border-radius: 4px;
+      pointer-events: none;
+    }
+
+    .filters {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      flex: 1 1 auto;
+    }
+    .chip {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-family: var(--font-mono);
+      letter-spacing: 0.01em;
+      color: var(--text-muted);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      transition: all .15s var(--ease);
+      white-space: nowrap;
+    }
+    .chip:hover { color: var(--text); border-color: var(--border-strong); }
+    .chip[aria-pressed="true"] {
+      background: var(--accent);
+      color: var(--bg);
+      border-color: var(--accent);
+    }
+    .chip .lang-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+    .chip .count {
+      font-size: 10px;
+      opacity: 0.6;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+    }
+    .meta-row .count { color: var(--text-muted); }
+    .view-toggle { display: inline-flex; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+    .view-toggle button {
+      padding: 6px 10px;
+      color: var(--text-faint);
+      transition: all .15s var(--ease);
+    }
+    .view-toggle button:hover { color: var(--text); }
+    .view-toggle button[aria-pressed="true"] {
+      background: var(--surface-2);
+      color: var(--text);
+    }
+    .view-toggle button svg { width: 14px; height: 14px; display: block; }
+    .view-toggle button + button { border-left: 1px solid var(--border); }
+
+    /* ---------- Grid ---------- */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 14px;
+    }
+    .grid.list {
+      grid-template-columns: 1fr;
+    }
+    .grid.list .card { padding: 18px 24px; }
+    .grid.list .card .desc { -webkit-line-clamp: 1; line-clamp: 1; min-height: 0; }
+
+    /* ---------- Card ---------- */
+    .card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding: 20px 22px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: border-color .2s var(--ease), transform .2s var(--ease), background-color .2s var(--ease);
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(600px circle at var(--mx, 50%) var(--my, 0%), var(--surface-2), transparent 40%);
+      opacity: 0;
+      transition: opacity .3s var(--ease);
+      pointer-events: none;
+      z-index: -1;
+    }
+    .card:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+    }
+    .card:hover::before { opacity: 1; }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+    .card .name {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      word-break: break-word;
+    }
+    .card .name .ns { color: var(--text-faint); font-weight: 400; }
+
+    .card .visibility {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      padding: 3px 8px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      flex-shrink: 0;
+    }
+
+    .card .desc {
+      color: var(--text-muted);
+      font-size: 13.5px;
+      line-height: 1.55;
+      margin: 10px 0 18px;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      overflow: hidden;
+      min-height: calc(13.5px * 1.55 * 2);
+    }
+    .card .desc.empty { font-style: italic; color: var(--text-faint); }
+
+    .card-foot {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 14px;
+      border-top: 1px dashed var(--border);
+    }
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+    }
+    .card-meta .item { display: inline-flex; align-items: center; gap: 6px; }
+    .card-meta .lang-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--text-faint);
+    }
+    .card-meta svg { width: 12px; height: 12px; }
+    .card-meta time { font-variant-numeric: tabular-nums; }
+
+    .launch {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      font-family: var(--font-mono);
+      letter-spacing: 0.01em;
+      color: var(--launch-fg);
+      background: var(--launch);
+      border-radius: var(--radius-sm);
+      transition: transform .2s var(--ease), opacity .2s var(--ease);
+      white-space: nowrap;
+    }
+    .launch svg { width: 12px; height: 12px; transition: transform .2s var(--ease); }
+    .card:hover .launch svg { transform: translate(2px, -2px); }
+    .launch:hover { opacity: 0.9; }
+
+    .card-link-overlay {
+      position: absolute; inset: 0; z-index: 1;
+    }
+    .card-foot, .launch { position: relative; z-index: 2; }
+
+    /* ---------- Skeleton ---------- */
+    @keyframes shimmer {
+      0%   { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+    .skel {
+      background: linear-gradient(90deg, var(--skeleton-a) 0%, var(--skeleton-b) 50%, var(--skeleton-a) 100%);
+      background-size: 800px 100%;
+      animation: shimmer 1.6s linear infinite;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    .card.is-skel { pointer-events: none; }
+    .card.is-skel .skel-line { height: 12px; margin-bottom: 10px; border-radius: 4px; }
+
+    /* ---------- Empty / error state ---------- */
+    .state {
+      text-align: center;
+      padding: 80px 24px;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+    }
+    .state h3 {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin: 0 0 8px;
+    }
+    .state p { color: var(--text-muted); margin: 0 auto; max-width: 44ch; font-size: 14px; }
+    .state .retry {
+      margin-top: 20px;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      transition: all .15s var(--ease);
+    }
+    .state .retry:hover { background: var(--surface-2); border-color: var(--border-strong); }
+    .state.error h3 { color: var(--danger); }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 96px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-faint);
+      letter-spacing: 0.03em;
+    }
+    .footer a { color: var(--text-muted); transition: color .15s var(--ease); }
+    .footer a:hover { color: var(--text); }
+
+    /* Reduce motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
 </head>
 <body>
-    <h1>My SPAs</h1>
-    <div id="dashboard" class="grid">Loading projects...</div>
+  <main class="shell">
 
-    <script>
-        const username = 'josephararil';
-        const dashboard = document.getElementById('dashboard');
+    <!-- ─── Top bar ─────────────────────────────────────────── -->
+    <div class="topbar">
+      <div class="brand">
+        <span class="dot" aria-hidden="true"></span>
+        <span>josephararil / dashboard</span>
+      </div>
+      <div class="topbar-actions">
+        <a class="icon-btn" href="https://github.com/josephararil" target="_blank" rel="noopener noreferrer" aria-label="GitHub profile">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.47.11-3.07 0 0 .97-.31 3.18 1.18.92-.26 1.91-.39 2.89-.39.98 0 1.97.13 2.89.39 2.21-1.49 3.18-1.18 3.18-1.18.63 1.6.23 2.78.11 3.07.74.81 1.19 1.84 1.19 3.1 0 4.42-2.69 5.4-5.25 5.68.41.36.78 1.06.78 2.13v3.16c0 .31.21.68.8.56C20.21 21.38 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+        </a>
+        <button class="icon-btn" id="theme-toggle" aria-label="Toggle theme">
+          <svg id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          </svg>
+          <svg id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
 
-        async function fetchRepos() {
-            try {
-                const response = await fetch(`https://api.github.com/users/${username}/repos?sort=updated`);
-                const repos = await response.json();
-                
-                // Filter out the root dashboard repo itself, forks, or repos without pages if desired
-                const spaRepos = repos.filter(repo => repo.name !== `${username}.github.io` && !repo.fork);
+    <!-- ─── Hero ────────────────────────────────────────────── -->
+    <header class="hero">
+      <div class="avatar" id="avatar">
+        <div class="fallback" aria-hidden="true">jA</div>
+      </div>
+      <div class="hero-text">
+        <div class="eyebrow">Index ·  Personal Projects</div>
+        <h1>Joseph Araril — <span class="accent">builds &amp; experiments</span></h1>
+        <p>A live index of single-page applications and prototypes deployed under <code style="font-family:var(--font-mono);font-size:13px;color:var(--text)">josephararil.github.io</code>. Each card launches the live build.</p>
+      </div>
+      <div class="hero-links">
+        <a class="ghost-link" href="https://github.com/josephararil" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.47.11-3.07 0 0 .97-.31 3.18 1.18.92-.26 1.91-.39 2.89-.39.98 0 1.97.13 2.89.39 2.21-1.49 3.18-1.18 3.18-1.18.63 1.6.23 2.78.11 3.07.74.81 1.19 1.84 1.19 3.1 0 4.42-2.69 5.4-5.25 5.68.41.36.78 1.06.78 2.13v3.16c0 .31.21.68.8.56C20.21 21.38 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+          Profile
+        </a>
+      </div>
+    </header>
 
-                if(spaRepos.length === 0) {
-                    dashboard.innerHTML = '<p>No projects found.</p>';
-                    return;
-                }
+    <!-- ─── Toolbar ─────────────────────────────────────────── -->
+    <div class="toolbar">
+      <div class="search">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>
+        </svg>
+        <input id="search" type="search" placeholder="Search projects by name or description…" autocomplete="off" spellcheck="false" />
+        <kbd>⌘K</kbd>
+      </div>
+      <div class="filters" id="filters" role="tablist" aria-label="Filter projects"></div>
+    </div>
 
-                dashboard.innerHTML = spaRepos.map(repo => `
-                    <div class="card">
-                        <h3>${repo.name}</h3>
-                        <p>${repo.description || 'No description provided.'}</p>
-                        <a href="https://${username}.github.io/${repo.name}/" target="_blank">Launch App →</a>
-                    </div>
-                `).join('');
-            } catch (error) {
-                dashboard.innerHTML = '<p>Error loading repositories.</p>';
-            }
+    <div class="meta-row">
+      <span class="count" id="count">— projects</span>
+      <div class="view-toggle" role="group" aria-label="View mode">
+        <button id="view-grid" aria-pressed="true" aria-label="Grid view">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </button>
+        <button id="view-list" aria-pressed="false" aria-label="List view">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ─── Grid ────────────────────────────────────────────── -->
+    <section id="dashboard" class="grid" aria-live="polite"></section>
+
+    <!-- ─── Footer ──────────────────────────────────────────── -->
+    <footer class="footer">
+      <span>© <span id="year"></span> · Built with vanilla JS · No tracking</span>
+      <span>
+        <a href="https://docs.github.com/en/rest" target="_blank" rel="noopener noreferrer">GitHub REST</a>
+        ·
+        <a href="https://github.com/josephararil/josephararil.github.io" target="_blank" rel="noopener noreferrer">View source</a>
+      </span>
+    </footer>
+  </main>
+
+  <script>
+    /* ───────────────────────── Config ───────────────────────── */
+    const USERNAME = 'josephararil';
+    const API = `https://api.github.com/users/${USERNAME}/repos?sort=updated&per_page=100`;
+    const USER_API = `https://api.github.com/users/${USERNAME}`;
+
+    /* GitHub-style language colors (truncated to common set) */
+    const LANG_COLOR = {
+      JavaScript: '#f1e05a', TypeScript: '#3178c6', Python: '#3572A5',
+      HTML: '#e34c26', CSS: '#563d7c', SCSS: '#c6538c', Vue: '#41b883',
+      Svelte: '#ff3e00', Astro: '#ff5a03', Go: '#00ADD8', Rust: '#dea584',
+      Java: '#b07219', Kotlin: '#A97BFF', Swift: '#F05138', Ruby: '#701516',
+      PHP: '#4F5D95', C: '#555555', 'C++': '#f34b7d', 'C#': '#178600',
+      Shell: '#89e051', Dockerfile: '#384d54', Jupyter: '#DA5B0B',
+      Elixir: '#6e4a7e', Haskell: '#5e5086', Lua: '#000080',
+      Solidity: '#AA6746', Zig: '#ec915c', Nim: '#37775b', Dart: '#00B4AB'
+    };
+    const langColor = (l) => l ? (LANG_COLOR[l] || '#888') : '#3a3a3a';
+
+    /* ───────────────────────── DOM ──────────────────────────── */
+    const $ = (s) => document.querySelector(s);
+    const dashboard = $('#dashboard');
+    const searchInput = $('#search');
+    const filtersEl = $('#filters');
+    const countEl = $('#count');
+    const avatarEl = $('#avatar');
+    const themeBtn = $('#theme-toggle');
+    const iconSun = $('#icon-sun');
+    const iconMoon = $('#icon-moon');
+    const viewGrid = $('#view-grid');
+    const viewList = $('#view-list');
+    $('#year').textContent = new Date().getFullYear();
+
+    /* ───────────────────────── State ────────────────────────── */
+    let allRepos = [];
+    let currentFilter = 'all';   // 'all' | 'recent' | language string
+    let currentQuery = '';
+
+    /* ───────────────────────── Theme ────────────────────────── */
+    const applyTheme = (t) => {
+      document.documentElement.setAttribute('data-theme', t);
+      iconSun.style.display  = t === 'dark'  ? 'none' : 'block';
+      iconMoon.style.display = t === 'light' ? 'none' : 'block';
+      try { localStorage.setItem('theme', t); } catch (e) {}
+    };
+    (() => {
+      let saved = null;
+      try { saved = localStorage.getItem('theme'); } catch (e) {}
+      applyTheme(saved || 'dark');
+    })();
+    themeBtn.addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+    });
+
+    /* ───────────────────────── View toggle ──────────────────── */
+    const setView = (mode) => {
+      dashboard.classList.toggle('list', mode === 'list');
+      viewGrid.setAttribute('aria-pressed', mode === 'grid');
+      viewList.setAttribute('aria-pressed', mode === 'list');
+      try { localStorage.setItem('view', mode); } catch (e) {}
+    };
+    viewGrid.addEventListener('click', () => setView('grid'));
+    viewList.addEventListener('click', () => setView('list'));
+    try {
+      const v = localStorage.getItem('view');
+      if (v) setView(v);
+    } catch (e) {}
+
+    /* ───────────────────────── Skeleton ─────────────────────── */
+    const renderSkeleton = (n = 6) => {
+      dashboard.innerHTML = Array.from({length: n}, () => `
+        <article class="card is-skel" aria-hidden="true">
+          <div class="card-head">
+            <span class="skel" style="width:60%;height:14px"></span>
+            <span class="skel" style="width:48px;height:18px;border-radius:999px"></span>
+          </div>
+          <div class="skel skel-line" style="width:95%"></div>
+          <div class="skel skel-line" style="width:78%;margin-bottom:24px"></div>
+          <div class="card-foot" style="border-top-style:solid">
+            <span class="skel" style="width:120px;height:11px"></span>
+            <span class="skel" style="width:78px;height:24px;border-radius:6px"></span>
+          </div>
+        </article>
+      `).join('');
+      countEl.textContent = 'Loading projects…';
+    };
+
+    /* ───────────────────────── Time formatting ──────────────── */
+    const relTime = (iso) => {
+      const d = new Date(iso);
+      const diff = (Date.now() - d.getTime()) / 1000;
+      const units = [
+        ['y', 31536000], ['mo', 2592000], ['w', 604800],
+        ['d', 86400], ['h', 3600], ['m', 60]
+      ];
+      for (const [u, s] of units) {
+        const n = Math.floor(diff / s);
+        if (n >= 1) return `${n}${u} ago`;
+      }
+      return 'just now';
+    };
+    const isRecent = (iso) => (Date.now() - new Date(iso).getTime()) < (1000 * 60 * 60 * 24 * 30);
+
+    /* ───────────────────────── Escaping ─────────────────────── */
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
+
+    /* ───────────────────────── Render filters ───────────────── */
+    const renderFilters = () => {
+      const langs = {};
+      allRepos.forEach(r => {
+        if (r.language) langs[r.language] = (langs[r.language] || 0) + 1;
+      });
+      const sortedLangs = Object.entries(langs).sort((a, b) => b[1] - a[1]).slice(0, 6);
+      const recentCount = allRepos.filter(r => isRecent(r.updated_at)).length;
+
+      const items = [
+        { id: 'all',    label: 'All',    count: allRepos.length, color: null },
+        { id: 'recent', label: 'Recent', count: recentCount,     color: null },
+        ...sortedLangs.map(([lang, n]) => ({ id: lang, label: lang, count: n, color: langColor(lang) }))
+      ];
+
+      filtersEl.innerHTML = items.map(it => `
+        <button class="chip" data-filter="${esc(it.id)}" aria-pressed="${it.id === currentFilter}" role="tab">
+          ${it.color ? `<span class="lang-dot" style="background:${it.color};color:${it.color}"></span>` : ''}
+          <span>${esc(it.label)}</span>
+          <span class="count">${it.count}</span>
+        </button>
+      `).join('');
+
+      filtersEl.querySelectorAll('.chip').forEach(b => {
+        b.addEventListener('click', () => {
+          currentFilter = b.dataset.filter;
+          filtersEl.querySelectorAll('.chip').forEach(x =>
+            x.setAttribute('aria-pressed', x.dataset.filter === currentFilter)
+          );
+          render();
+        });
+      });
+    };
+
+    /* ───────────────────────── Render cards ─────────────────── */
+    const cardHTML = (repo) => {
+      const desc = repo.description?.trim();
+      const lang = repo.language;
+      const launchUrl = `https://${USERNAME}.github.io/${repo.name}/`;
+      const stars = repo.stargazers_count || 0;
+      return `
+        <article class="card" data-name="${esc(repo.name)}">
+          <a class="card-link-overlay" href="${esc(launchUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Launch ${esc(repo.name)}"></a>
+          <div class="card-head">
+            <h3 class="name"><span class="ns">${USERNAME}/</span>${esc(repo.name)}</h3>
+            <span class="visibility">${repo.private ? 'Private' : 'Public'}</span>
+          </div>
+          <p class="desc${desc ? '' : ' empty'}">${desc ? esc(desc) : 'No description provided.'}</p>
+          <div class="card-foot">
+            <div class="card-meta">
+              ${lang ? `<span class="item"><span class="lang-dot" style="background:${langColor(lang)}"></span>${esc(lang)}</span>` : ''}
+              ${stars ? `<span class="item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                ${stars}
+              </span>` : ''}
+              <span class="item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+                <time datetime="${esc(repo.updated_at)}">${relTime(repo.updated_at)}</time>
+              </span>
+            </div>
+            <a class="launch" href="${esc(launchUrl)}" target="_blank" rel="noopener noreferrer">
+              Launch
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>
+            </a>
+          </div>
+        </article>
+      `;
+    };
+
+    const render = () => {
+      let list = allRepos.slice();
+
+      if (currentFilter === 'recent') {
+        list = list.filter(r => isRecent(r.updated_at));
+      } else if (currentFilter !== 'all') {
+        list = list.filter(r => r.language === currentFilter);
+      }
+
+      const q = currentQuery.trim().toLowerCase();
+      if (q) {
+        list = list.filter(r =>
+          r.name.toLowerCase().includes(q) ||
+          (r.description || '').toLowerCase().includes(q)
+        );
+      }
+
+      countEl.textContent = `${list.length} ${list.length === 1 ? 'project' : 'projects'}` +
+        (q ? ` · matching "${currentQuery}"` : '') +
+        (currentFilter !== 'all' ? ` · ${currentFilter}` : '');
+
+      if (list.length === 0) {
+        dashboard.innerHTML = `
+          <div class="state" style="grid-column:1/-1">
+            <h3>Nothing here</h3>
+            <p>No projects match the current filter${q ? ` and search "${esc(currentQuery)}"` : ''}.</p>
+          </div>`;
+        return;
+      }
+
+      dashboard.innerHTML = list.map(cardHTML).join('');
+
+      /* mouse-tracked spotlight on cards */
+      dashboard.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('pointermove', (e) => {
+          const r = card.getBoundingClientRect();
+          card.style.setProperty('--mx', `${e.clientX - r.left}px`);
+          card.style.setProperty('--my', `${e.clientY - r.top}px`);
+        });
+      });
+    };
+
+    /* ───────────────────────── User (avatar) ────────────────── */
+    const loadUser = async () => {
+      try {
+        const r = await fetch(USER_API);
+        if (!r.ok) return;
+        const u = await r.json();
+        if (u.avatar_url) {
+          avatarEl.innerHTML = `<img src="${esc(u.avatar_url)}" alt="${esc(u.login)}" />`;
         }
+      } catch (e) { /* avatar is non-critical */ }
+    };
 
-        fetchRepos();
-    </script>
+    /* ───────────────────────── Fetch ────────────────────────── */
+    const fetchRepos = async () => {
+      renderSkeleton();
+      try {
+        const r = await fetch(API);
+        if (!r.ok) {
+          if (r.status === 403) throw new Error('rate-limit');
+          throw new Error('fetch-failed');
+        }
+        const repos = await r.json();
+        allRepos = repos
+          .filter(repo => repo.name !== `${USERNAME}.github.io` && !repo.fork)
+          .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+
+        renderFilters();
+        render();
+      } catch (err) {
+        const isRate = err.message === 'rate-limit';
+        dashboard.innerHTML = `
+          <div class="state error" style="grid-column:1/-1">
+            <h3>${isRate ? 'API rate limit reached' : 'Unable to load projects'}</h3>
+            <p>${isRate
+              ? 'GitHub limits anonymous API requests to 60 per hour from a single IP. Try again shortly.'
+              : 'Something went wrong fetching repositories from GitHub. Check your network and retry.'}</p>
+            <button class="retry" id="retry">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 4 21 10 15 10"/></svg>
+              Retry
+            </button>
+          </div>`;
+        countEl.textContent = 'Error';
+        $('#retry')?.addEventListener('click', fetchRepos);
+      }
+    };
+
+    /* ───────────────────────── Search ───────────────────────── */
+    let searchT;
+    searchInput.addEventListener('input', (e) => {
+      clearTimeout(searchT);
+      currentQuery = e.target.value;
+      searchT = setTimeout(render, 80);
+    });
+
+    /* ⌘K / Ctrl+K to focus search */
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        searchInput.focus();
+        searchInput.select();
+      }
+      if (e.key === 'Escape' && document.activeElement === searchInput) {
+        searchInput.value = '';
+        currentQuery = '';
+        render();
+        searchInput.blur();
+      }
+    });
+
+    /* ───────────────────────── Boot ─────────────────────────── */
+    loadUser();
+    fetchRepos();
+  </script>
 </body>
 </html>
