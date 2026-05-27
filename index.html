@@ -572,6 +572,68 @@
     .state .retry:hover { background: var(--surface-2); border-color: var(--border-strong); }
     .state.error h3 { color: var(--danger); }
 
+    /* ---------- Testimonials ---------- */
+    .testimonials-section {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    @media (min-width: 720px) {
+      .testimonials-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .testimonial {
+      background: var(--surface);
+      padding: 28px 28px 24px;
+      display: flex;
+      flex-direction: column;
+    }
+    .testimonial-mark {
+      font-family: var(--font-serif);
+      font-size: 52px;
+      line-height: 1;
+      color: var(--text-faint);
+      margin-bottom: 10px;
+      opacity: 0.5;
+    }
+    .testimonial-quote {
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--text-muted);
+      margin: 0 0 auto;
+      padding-bottom: 20px;
+    }
+    .testimonial-byline {
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+    }
+    .testimonial-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+    .testimonial-role {
+      font-size: 12px;
+      color: var(--text-faint);
+      line-height: 1.45;
+      margin-bottom: 7px;
+    }
+    .testimonial-meta {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+    }
+
     /* ---------- CTA section ---------- */
     .cta-section {
       margin: 80px 0 0;
@@ -844,6 +906,45 @@
       </div>
 
       <section id="dashboard" class="grid" aria-live="polite"></section>
+    </section>
+
+    <!-- ─── Testimonials ────────────────────────────────────── -->
+    <section class="testimonials-section" aria-labelledby="testimonials-title">
+      <p class="eyebrow">WHAT PEOPLE SAY</p>
+      <h2 class="section-title" id="testimonials-title">Trusted by the people <em>I've worked with</em></h2>
+      <div class="testimonials-grid">
+
+        <div class="testimonial">
+          <div class="testimonial-mark">&ldquo;</div>
+          <p class="testimonial-quote">I worked closely with Joseph for years — he's one of the sharpest minds I've known. From Team Captain to SVP of Technology &amp; Program Management, his rapid rise showcases exceptional leadership. Coming from sales, he progressed brilliantly in software development, architecting robust infrastructure with smart workarounds and no technical debt. His training and mentorship elevate entire teams. Always eager to learn and critically evaluate new practices, he brings innovative solutions that drive real results. A true leader and standout talent.</p>
+          <div class="testimonial-byline">
+            <div class="testimonial-name">Milena Milusheva</div>
+            <div class="testimonial-role">Product Owner · PSPO I &amp; PRINCE2 Certified</div>
+            <div class="testimonial-meta">Colleague · February 2026</div>
+          </div>
+        </div>
+
+        <div class="testimonial">
+          <div class="testimonial-mark">&ldquo;</div>
+          <p class="testimonial-quote">Joseph is without doubt one of the most knowledgeable people I've worked with, across pretty much any topic. He took me from the sales team and into his team — something that very likely changed the entire trajectory of my career. He consistently went out of his way to pass on knowledge, not just to his direct reports, but across the wider company. Extremely proactive — always learning, always curious, always trying to apply what he learns to make everyone's job easier. His progression from Customer Service Representative all the way to SVP of Technology at FXCM&nbsp;/&nbsp;Tradu really speaks for itself.</p>
+          <div class="testimonial-byline">
+            <div class="testimonial-name">Valentin Popov</div>
+            <div class="testimonial-role">Product Operations Manager · Fintech &amp; Payments</div>
+            <div class="testimonial-meta">Direct report · December 2025</div>
+          </div>
+        </div>
+
+        <div class="testimonial">
+          <div class="testimonial-mark">&ldquo;</div>
+          <p class="testimonial-quote">I worked with Joseph on delivering a technical program at FXCM where he was the technical program manager. He has solid business knowledge of the trading flow front to back, as well as the technical knowledge to challenge architectural decisions and delivery timelines. An all-round programme manager that is able to get the best out of the delivery team.</p>
+          <div class="testimonial-byline">
+            <div class="testimonial-name">Yip Wong</div>
+            <div class="testimonial-role">Technical Program Management</div>
+            <div class="testimonial-meta">External collaborator · December 2025</div>
+          </div>
+        </div>
+
+      </div>
     </section>
 
     <!-- ─── CTA ──────────────────────────────────────────────── -->
