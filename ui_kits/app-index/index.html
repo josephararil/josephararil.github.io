@@ -1,0 +1,136 @@
+<!-- @dsCard group="Components" -->
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="Joseph Harari — an index of the apps and experiments I build and ship." />
+  <meta name="theme-color" content="#f5f5f7" />
+  <title>Joseph Harari — Apps</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ─── Top bar ─────────────────────────────────────────── -->
+  <header class="topbar" id="topbar">
+    <div class="topbar-inner">
+      <a class="wordmark" href="#top" aria-label="Joseph Harari, home">
+        <span class="mono" id="mark">JH</span>
+        <span>Joseph Harari</span>
+      </a>
+      <div class="topbar-actions">
+        <a class="iconbtn" href="https://github.com/josephararil" target="_blank" rel="noopener noreferrer" aria-label="GitHub profile">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.47.11-3.07 0 0 .97-.31 3.18 1.18.92-.26 1.91-.39 2.89-.39.98 0 1.97.13 2.89.39 2.21-1.49 3.18-1.18 3.18-1.18.63 1.6.23 2.78.11 3.07.74.81 1.19 1.84 1.19 3.1 0 4.42-2.69 5.4-5.25 5.68.41.36.78 1.06.78 2.13v3.16c0 .31.21.68.8.56C20.21 21.38 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+        </a>
+        <div class="pop-wrap">
+          <button class="iconbtn" id="settings-btn" aria-label="Appearance settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </button>
+          <div class="popover" id="settings-pop">
+            <div class="pop-section">
+              <p class="pop-label">Appearance</p>
+              <div class="seg" id="seg-theme">
+                <button data-val="light">Light</button>
+                <button data-val="dark">Dark</button>
+                <button data-val="auto">Auto</button>
+              </div>
+            </div>
+            <div class="pop-section">
+              <p class="pop-label">Accent</p>
+              <div class="swatches" id="sw-accent">
+                <button class="swatch" data-val="blue" style="background:#0071e3" aria-label="Blue"></button>
+                <button class="swatch" data-val="indigo" style="background:#5e5ce6" aria-label="Indigo"></button>
+                <button class="swatch" data-val="green" style="background:#1d9d57" aria-label="Green"></button>
+                <button class="swatch" data-val="orange" style="background:#f5731f" aria-label="Orange"></button>
+                <button class="swatch" data-val="pink" style="background:#e0489a" aria-label="Pink"></button>
+                <button class="swatch" data-val="graphite" style="background:#3a3a3c" aria-label="Graphite"></button>
+              </div>
+            </div>
+            <div class="pop-section">
+              <p class="pop-label">Density</p>
+              <div class="seg" id="seg-density">
+                <button data-val="comfortable">Comfortable</button>
+                <button data-val="compact">Compact</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell" id="top">
+
+    <!-- ─── Hero ──────────────────────────────────────────── -->
+    <section class="hero">
+      <p class="eyebrow" id="hero-count">Loading…</p>
+      <h1>Things I build, <span class="soft">all in one place.</span></h1>
+      <p class="lede">
+        I spent ten years running technology programs at FXCM and Tradu, shipping trading platforms
+        to hundreds of thousands of traders. These days I build small, sharp apps — for planning, for
+        learning, for the people around me. This is a live index of them.
+      </p>
+      <div class="hero-meta">
+        <a href="https://josepharari.com/about" target="_blank" rel="noopener noreferrer">Read more about me <span class="arrow">→</span></a>
+        <span class="dotsep"></span>
+        <a href="https://github.com/josephararil" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.47.11-3.07 0 0 .97-.31 3.18 1.18.92-.26 1.91-.39 2.89-.39.98 0 1.97.13 2.89.39 2.21-1.49 3.18-1.18 3.18-1.18.63 1.6.23 2.78.11 3.07.74.81 1.19 1.84 1.19 3.1 0 4.42-2.69 5.4-5.25 5.68.41.36.78 1.06.78 2.13v3.16c0 .31.21.68.8.56C20.21 21.38 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </section>
+
+    <!-- ─── Controls ──────────────────────────────────────── -->
+    <div class="controls">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="search" type="search" placeholder="Search apps…" autocomplete="off" spellcheck="false" aria-label="Search apps" />
+      </div>
+      <div class="chips" id="chips" role="tablist" aria-label="Filter by category"></div>
+    </div>
+
+    <!-- ─── Sections / grid ───────────────────────────────── -->
+    <div id="sections" aria-live="polite"></div>
+
+    <!-- ─── Footer ────────────────────────────────────────── -->
+    <footer class="footer">
+      <span>© <span id="year"></span> Joseph Harari · Built and hosted on GitHub Pages</span>
+      <span class="links">
+        <a href="https://github.com/josephararil" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://josepharari.com/about" target="_blank" rel="noopener noreferrer">About</a>
+      </span>
+    </footer>
+  </main>
+
+  <!-- ─── Detail modal ────────────────────────────────────── -->
+  <div class="modal-scrim" id="modal-scrim" role="dialog" aria-modal="true" aria-labelledby="m-title">
+    <div class="modal">
+      <div class="modal-scroll">
+        <div class="modal-art" id="m-art"></div>
+        <button class="modal-close" id="modal-close" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+        <div class="modal-body">
+          <p class="modal-cat" id="m-cat"></p>
+          <h2 id="m-title"></h2>
+          <p class="modal-desc" id="m-desc"></p>
+          <ul class="modal-highlights" id="m-highlights"></ul>
+          <div class="modal-meta" id="m-meta"></div>
+          <div class="modal-actions">
+            <a class="btn btn-primary" id="m-launch" target="_blank" rel="noopener noreferrer">
+              Launch app <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg></span>
+            </a>
+            <a class="btn btn-secondary" id="m-repo" target="_blank" rel="noopener noreferrer">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.47.11-3.07 0 0 .97-.31 3.18 1.18.92-.26 1.91-.39 2.89-.39.98 0 1.97.13 2.89.39 2.21-1.49 3.18-1.18 3.18-1.18.63 1.6.23 2.78.11 3.07.74.81 1.19 1.84 1.19 3.1 0 4.42-2.69 5.4-5.25 5.68.41.36.78 1.06.78 2.13v3.16c0 .31.21.68.8.56C20.21 21.38 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+              View source
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!-- @dsCard group="Colors" -->
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 28px 32px; background: var(--bg); }
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+  .g { border-radius: var(--r-tile); height: 92px; position: relative; overflow: hidden; box-shadow: var(--shadow-rest); }
+  .g::after { content: ""; position: absolute; inset: 0; background: radial-gradient(120% 90% at 18% 12%, rgba(255,255,255,.32), transparent 55%); }
+  .lab { margin-top: 9px; font-size: 12px; font-weight: 600; }
+  .lab span { display: block; font-family: var(--font-mono); font-size: 10px; color: var(--text-3); font-weight: 400; }
+</style></head>
+<body>
+  <div class="grid">
+    <div><div class="g" style="background:linear-gradient(140deg,#16b6a4,#0a84d8,#1148b8)"></div><div class="lab">Compass</div></div>
+    <div><div class="g" style="background:linear-gradient(140deg,#ff9d54,#ff5fa2,#a855f7)"></div><div class="lab">Storybook</div></div>
+    <div><div class="g" style="background:linear-gradient(140deg,#ff7eb6,#9b7bff,#ffd16b)"></div><div class="lab">Sophie</div></div>
+    <div><div class="g" style="background:linear-gradient(140deg,#a7e34d,#34c759,#0aa66a)"></div><div class="lab">Tennis</div></div>
+    <div><div class="g" style="background:linear-gradient(140deg,#5b6b86,#3a4458,#222838)"></div><div class="lab">About</div></div>
+  </div>
+  <p class="lab" style="margin-top:18px;font-weight:400;color:var(--text-3);font-size:12px">2–3 stops · 140° · soft white top-left highlight · app artwork only, never page backgrounds</p>
+</body></html>

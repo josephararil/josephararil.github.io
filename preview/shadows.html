@@ -1,0 +1,20 @@
+<!-- @dsCard group="Spacing" -->
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 36px 40px; background: var(--bg); }
+  .row { display: flex; gap: 40px; }
+  .item { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .box { width: 130px; height: 78px; background: var(--surface); border: 1px solid var(--hairline); border-radius: 18px; }
+  .rest { box-shadow: var(--shadow-rest); }
+  .hover { box-shadow: var(--shadow-hover); }
+  .modal { box-shadow: var(--shadow-modal); }
+  b { font-size: 12.5px; font-weight: 600; }
+</style></head>
+<body>
+  <div class="row">
+    <div class="item"><div class="box rest"></div><b>rest</b></div>
+    <div class="item"><div class="box hover"></div><b>hover (lifted)</b></div>
+    <div class="item"><div class="box modal"></div><b>modal (deep)</b></div>
+  </div>
+</body></html>

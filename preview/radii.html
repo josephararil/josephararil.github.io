@@ -1,0 +1,23 @@
+<!-- @dsCard group="Spacing" -->
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 30px 32px; background: var(--bg); }
+  .row { display: flex; gap: 22px; align-items: flex-end; flex-wrap: wrap; }
+  .item { display: flex; flex-direction: column; align-items: center; gap: 9px; }
+  .box { width: 78px; height: 64px; background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--shadow-rest); }
+  .item b { font-size: 12px; font-weight: 600; }
+  .item span { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-3); }
+  .pill { width: 110px; border-radius: var(--r-pill); }
+</style></head>
+<body>
+  <div class="row">
+    <div class="item"><div class="box" style="border-radius:8px"></div><b>xs</b><span>8</span></div>
+    <div class="item"><div class="box" style="border-radius:12px"></div><b>sm</b><span>12</span></div>
+    <div class="item"><div class="box" style="border-radius:18px"></div><b>tile</b><span>18</span></div>
+    <div class="item"><div class="box" style="border-radius:22px"></div><b>glyph</b><span>22</span></div>
+    <div class="item"><div class="box" style="border-radius:24px"></div><b>card</b><span>24</span></div>
+    <div class="item"><div class="box" style="border-radius:28px"></div><b>lg</b><span>28</span></div>
+    <div class="item"><div class="box pill"></div><b>pill</b><span>980</span></div>
+  </div>
+</body></html>
