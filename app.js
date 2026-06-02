@@ -18,7 +18,7 @@ const API      = `https://api.github.com/users/${USERNAME}/repos?sort=updated&pe
 const USER_API = `https://api.github.com/users/${USERNAME}`;
 
 /* Category display order (sections render in this order) */
-const CATEGORY_ORDER = ["Finance", "Kids & Learning", "Productivity", "Personal", "More"];
+const CATEGORY_ORDER = ["Finance", "Kids & Learning", "Productivity", "Personal", "Design", "More"];
 
 /* ---- Curated metadata, keyed by repo name --------------------------------
    Fields: name, tagline, description, highlights[], category, featured?,
@@ -107,6 +107,25 @@ const APPS = {
     glyph: "person",
     gradient: ["#5b6b86", "#3a4458", "#222838"],
     shot: "screens/about.png",
+  },
+  "aperture": {
+    name: "Aperture",
+    tagline: "Apple-flavored design system.",
+    description:
+      "The visual language behind josepharari.com — an Apple-flavored, light-primary system for a growing family of small, personal single-page apps. It exists so any future app (or its landing card) can be built fast and look like it belongs to the same considered, premium family.",
+    highlights: [
+      "Voice: first person, warm, understated, quietly confident",
+      "Casing: sentence case everywhere except tiny eyebrow labels (FEATURED, KIDS & LEARNING), which are uppercase with wide tracking",
+      "Punctuation & numbers: em dashes for asides; no exclamation marks; spell out unless a real figure matters",
+      "Emoji: none. Ever. Identity comes from custom glyphs + gradients, not emoji.",
+      "Length: ruthless. A card is a title + one-line tagline + a meta row. Depth lives in the detail modal, not on the surface. One thousand no's for every yes.",
+    ],
+    category: "Design",
+    featured: false,
+    tags: ["Design", "PWA"],
+    glyph: "generic",
+    gradient: ["#16b6a4", "#0a84d8", "#1148b8"],
+    shot: "screens/aperture.png",
   },
 };
 
