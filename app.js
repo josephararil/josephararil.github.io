@@ -470,7 +470,7 @@ const fetchRepos = async () => {
     if (!r.ok) throw new Error(r.status === 403 ? "rate" : "fail");
     const repos = await r.json();
     MODELS = repos
-      .filter((repo) => !repo.fork && repo.name !== `${USERNAME}.github.io` && repo.name !== "josepharari.com")
+      .filter((repo) => (!repo.fork || ["Trading-Platform"].includes(repo.name)) && repo.name !== `${USERNAME}.github.io` && repo.name !== "josepharari.com")
       .map(buildModel)
       // curated apps first, then by recency
       .sort((a, b) => (b.curated - a.curated) || (new Date(b.updated) - new Date(a.updated)));
