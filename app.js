@@ -18,7 +18,11 @@ const API      = `https://api.github.com/users/${USERNAME}/repos?sort=updated&pe
 const USER_API = `https://api.github.com/users/${USERNAME}`;
 
 /* Category display order (sections render in this order) */
-const CATEGORY_ORDER = ["Finance", "Kids & Learning", "Productivity", "Personal", "Design", "More"];
+const CATEGORY_ORDER = ["Finance", "Kids & Learning", "Productivity", "Automations", "Personal", "Design", "More"];
+
+/* Repos deliberately kept off the public index — empty, superseded, or not
+   ready to show (still curate/deploy them properly before removing here). */
+const EXCLUDED_REPOS = ["ava", "claude-memory", "fitness", "storybooks"];
 
 /* ---- Curated metadata, keyed by repo name --------------------------------
    Fields: name, tagline, description, highlights[], category, featured?,
@@ -127,6 +131,60 @@ const APPS = {
     gradient: ["#16b6a4", "#0a84d8", "#1148b8"],
     shot: "screens/aperture.png",
   },
+  "yearly": {
+    name: "Yearly",
+    tagline: "One number for the whole year, and why you're on track.",
+    description:
+      "A mobile-first annual budgeting PWA that tracks joint household spend in EUR against a single per-year ceiling — no monthly budget theatre, just a clear figure and a set of ranked, plain-language callouts explaining whether you're on track and why. Automated imports keep the numbers current without manual entry.",
+    highlights: [
+      "One annual ceiling instead of twelve monthly budgets",
+      "Ranked, plain-language callouts explain the 'why', not just the number",
+      "Automated bank-transaction import pipeline",
+      "Editorial 'Broadsheet' design theme — paper, hairlines, one accent",
+    ],
+    category: "Finance",
+    tags: ["Budgeting", "Prototype"],
+    glyph: "calendar",
+    gradient: ["#b5502f", "#d9784a", "#f0b980"],
+    headless: true,
+    runtimeNote: "Design prototype — not yet deployed",
+  },
+  "deal-hunter": {
+    name: "Diamond Finder",
+    tagline: "A quiet travel scout that only speaks up for a genuine deal.",
+    description:
+      "A personal travel deal-finder for a family of three near Plovdiv, Bulgaria. A three-stage LLM pipeline surfaces candidate trips, grounds them against live hotel rates, and scores net family value — then emails a digest only when something is a certified diamond, a good find, or worth knowing about. Runs daily on free GitHub Actions; no server, no dashboard, just a well-reasoned inbox.",
+    highlights: [
+      "Three-stage pipeline: find candidates, ground against live rates, score",
+      "Self-improving memory of price baselines and past verdicts",
+      "Deterministic scoring — the LLM never vetoes or invents a tier",
+      "Runs daily on GitHub Actions — zero always-on infrastructure",
+    ],
+    category: "Automations",
+    tags: ["LLM pipeline", "GitHub Actions", "Travel"],
+    glyph: "radar",
+    gradient: ["#0891b2", "#0a5ca8", "#1e3a8a"],
+    headless: true,
+    runtimeNote: "Runs daily on GitHub Actions — no UI, just email",
+  },
+  "weekly-concierge": {
+    name: "Weekend Concierge",
+    tagline: "A warm Friday email about what's worth doing this weekend.",
+    description:
+      "A weekend-activities concierge for a family of three near Plovdiv, Bulgaria — harvesting local event sources, checking the weather, and writing one warm, curated soft-itinerary every Friday: what's on this weekend, a rotating evergreen idea, and what's coming up in the next few weeks. Passive by design; the only interface is the inbox.",
+    highlights: [
+      "Harvests and verifies events from a dozen local sources",
+      "Weather-aware, family-fit scored recommendations",
+      "Evergreen idea rotation, so a quiet week is never an empty email",
+      "Runs weekly on GitHub Actions",
+    ],
+    category: "Automations",
+    tags: ["LLM pipeline", "GitHub Actions", "Family"],
+    glyph: "mail",
+    gradient: ["#f6ad55", "#ed64a6", "#805ad5"],
+    headless: true,
+    runtimeNote: "Runs weekly on GitHub Actions — no UI, just email",
+  },
 };
 
 /* ---- Glyphs (inline SVG, white currentColor) ---------------------------- */
@@ -137,6 +195,9 @@ const GLYPHS = {
   tennis: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="18"/><path d="M9 13c7 4 11 11 11 19 0 4-1 8-3 11"/><path d="M39 13c-7 4-11 11-11 19 0 4 1 8 3 11"/></svg>',
   person: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="17" r="8"/><path d="M9 41c1.5-8.5 7.5-13 15-13s13.5 4.5 15 13"/></svg>',
   generic: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="14" height="14" rx="4"/><rect x="26" y="8" width="14" height="14" rx="4"/><rect x="8" y="26" width="14" height="14" rx="4"/><rect x="26" y="26" width="14" height="14" rx="4"/></svg>',
+  calendar: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="10" width="32" height="30" rx="4"/><path d="M8 18h32"/><path d="M16 6v8M32 6v8"/><circle cx="24" cy="29" r="1.8" fill="currentColor" stroke="none"/></svg>',
+  radar: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="17"/><circle cx="24" cy="24" r="10"/><circle cx="24" cy="24" r="2.2" fill="currentColor" stroke="none"/><path d="M24 24 36 14"/></svg>',
+  mail: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="12" width="36" height="26" rx="4"/><path d="M8 14l16 13 16-13"/></svg>',
 };
 
 /* Fallback gradients for repos without curated metadata (chosen by hash) */
@@ -199,6 +260,8 @@ const buildModel = (repo) => {
     launchUrl: `${SITE}/${repo.name}`,
     repoUrl: repo.html_url || `https://github.com/${USERNAME}/${repo.name}`,
     curated: !!APPS[repo.name],
+    headless: !!meta.headless,
+    runtimeNote: meta.runtimeNote || "",
   };
 };
 
@@ -325,9 +388,10 @@ const openModal = (repo) => {
   $("#m-meta").innerHTML = `
     ${m.language ? `<span class="item"><span class="lang-dot" style="background:${LANG_COLOR[m.language] || "#9aa"}"></span>${esc(m.language)}</span>` : ""}
     <span class="item">Updated ${relTime(m.updated)}</span>
-    <span class="item">${esc(SITE.replace("https://", ""))}/${esc(m.repo)}</span>`;
+    <span class="item">${m.headless ? esc(m.runtimeNote || "No live app — GitHub only") : `${esc(SITE.replace("https://", ""))}/${esc(m.repo)}`}</span>`;
 
   $("#m-launch").href = m.launchUrl;
+  $("#m-launch").style.display = m.headless ? "none" : "";
   $("#m-repo").href = m.repoUrl;
 
   scrim.classList.add("open");
@@ -470,7 +534,7 @@ const fetchRepos = async () => {
     if (!r.ok) throw new Error(r.status === 403 ? "rate" : "fail");
     const repos = await r.json();
     MODELS = repos
-      .filter((repo) => (!repo.fork || ["Trading-Platform"].includes(repo.name)) && repo.name !== `${USERNAME}.github.io` && repo.name !== "josepharari.com")
+      .filter((repo) => (!repo.fork || ["Trading-Platform"].includes(repo.name)) && repo.name !== `${USERNAME}.github.io` && repo.name !== "josepharari.com" && !EXCLUDED_REPOS.includes(repo.name))
       .map(buildModel)
       // curated apps first, then by recency
       .sort((a, b) => (b.curated - a.curated) || (new Date(b.updated) - new Date(a.updated)));
