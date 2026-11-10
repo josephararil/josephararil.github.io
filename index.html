@@ -320,8 +320,9 @@
   var TAU = Math.PI * 2;
   var mq = window.matchMedia('(prefers-reduced-motion: reduce)');
   var calm = mq.matches;
+  var covered = document.documentElement.dataset.pondCovered === '1';
 
-  var W = 0, H = 0, DPR = 1, S = 1, M = 0, T = 0, last = 0, raf = 0, frameN = 0;
+  var W = 0, H = 0, DPR = 1, S = 1, M = 0, T = 0, last = 0, raf = 0, frameN = 0, coverSkip = 0;
 
   /* ---------- small helpers ---------- */
   function rngf(seed) {
@@ -373,10 +374,11 @@
   var shx = shCv.getContext('2d');
   var causCtx = causCv.getContext('2d');
   var causImg = null, causScale = 1, causMask = null;
+  var glCv = document.createElement('canvas'), gl = null, gpuCaus = false, glTex = null, glU = null;
   var SHK = 0.25;
 
   /* ---------- stones ---------- */
-  var stones = [];
+  var stones = [], stoneRects = [];
   function buildStones() {
     var r = rngf(977);
     stones = [];
@@ -493,6 +495,27 @@
       }
       c.restore();
     });
+    /* the stones sit in the corners: remember one rectangle per corner, so render() copies only those */
+    var q = [null, null, null, null];
+    stones.forEach(function (s) {
+      var k = (s.x < W / 2 ? 0 : 1) + (s.y < H / 2 ? 0 : 2), pad = s.r * 1.3 + 34, b = q[k];
+      if (!b) q[k] = [s.x - pad, s.y - pad, s.x + pad, s.y + pad];
+      else { b[0] = Math.min(b[0], s.x - pad); b[1] = Math.min(b[1], s.y - pad); b[2] = Math.max(b[2], s.x + pad); b[3] = Math.max(b[3], s.y + pad); }
+    });
+    q = q.filter(Boolean).map(function (b) {
+      return [Math.floor(clamp(b[0], 0, W) * DPR) / DPR, Math.floor(clamp(b[1], 0, H) * DPR) / DPR,
+        Math.ceil(clamp(b[2], 0, W) * DPR) / DPR, Math.ceil(clamp(b[3], 0, H) * DPR) / DPR];
+    });
+    /* overlapping rectangles would draw the shared pixels twice, so merge them */
+    for (var i = 0; i < q.length; i++) for (var j = i + 1; j < q.length; j++) {
+      var A = q[i], B = q[j];
+      if (A[0] < B[2] && B[0] < A[2] && A[1] < B[3] && B[1] < A[3]) {
+        q[i] = [Math.min(A[0], B[0]), Math.min(A[1], B[1]), Math.max(A[2], B[2]), Math.max(A[3], B[3])];
+        q.splice(j, 1); i = -1; break;
+      }
+    }
+    stoneRects = q.map(function (b) { return { x: b[0], y: b[1], w: b[2] - b[0], h: b[3] - b[1] }; })
+      .filter(function (r) { return r.w > 0 && r.h > 0; });
   }
   function onStone(x, y) {
     for (var i = 0; i < stones.length; i++) {
@@ -575,7 +598,18 @@
     }
     var d = causImg.data;
     for (var i = 0; i < d.length; i += 4) { d[i] = 255; d[i + 1] = 255; d[i + 2] = 236; }
-    paintCaustics(3.1);
+    if (gpuCaus) {
+      var w = causCv.width, h = causCv.height, mb = new Uint8Array(w * h);
+      for (var j = 0; j < mb.length; j++) mb[j] = Math.round(Math.min(255, Math.max(0, causMask[j])));
+      glCv.width = w; glCv.height = h;
+      gl.viewport(0, 0, w, h);
+      gl.bindTexture(gl.TEXTURE_2D, glTex);
+      gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, w, h, 0, gl.ALPHA, gl.UNSIGNED_BYTE, mb);
+      gl.uniform1f(glU.scale, causScale);
+      gl.uniform2f(glU.size, w, h);
+    }
+    if (gpuCaus) renderCausticsGL(3.1); else paintCaustics(3.1);
   }
   function paintCaustics(time) {
     var cw = causCv.width, ch = causCv.height, d = causImg.data, sc = causScale, inten = 0.005, k = 3, mk = causMask, q = 0;
@@ -600,6 +634,66 @@
     }
     causCtx.putImageData(causImg, 0, 0);
   }
+  /* the same caustics on the GPU, every frame; paintCaustics above stays as the fallback */
+  (function () {
+    gl = glCv.getContext('webgl', { alpha: true, premultipliedAlpha: false, preserveDrawingBuffer: true, antialias: false, depth: false, stencil: false });
+    if (!gl) return;
+    function sh(type, src) {
+      var s = gl.createShader(type);
+      gl.shaderSource(s, src); gl.compileShader(s);
+      return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null;
+    }
+    var vs = sh(gl.VERTEX_SHADER, 'attribute vec2 aPos; void main() { gl_Position = vec4(aPos, 0.0, 1.0); }');
+    var fs = sh(gl.FRAGMENT_SHADER, [
+      'precision highp float;',
+      'uniform float uTime; uniform float uScale; uniform vec2 uSize; uniform sampler2D uMask;',
+      'void main() {',
+      '  float x = floor(gl_FragCoord.x);',
+      '  float y = uSize.y - 1.0 - floor(gl_FragCoord.y);',
+      '  float px = x * uScale - 250.0, py = y * uScale - 250.0;',
+      '  float ix = px, iy = py, c = 1.0;',
+      '  for (int n = 0; n < 3; n++) {',
+      '    float t = uTime * (1.0 - 3.5 / float(n + 1));',
+      '    float nx = px + cos(t - ix) + sin(t + iy);',
+      '    float ny = py + sin(t - iy) + cos(t + ix);',
+      '    ix = nx; iy = ny;',
+      '    float a = px / (sin(ix + t) / 0.005);',
+      '    float b = py / (cos(iy + t) / 0.005);',
+      '    c += 1.0 / sqrt(a * a + b * b);',
+      '  }',
+      '  c /= 3.0;',
+      '  c = 1.17 - pow(c, 1.4);',
+      '  float v = c * c; v = v * v; v = v * v;',
+      '  float m = texture2D(uMask, vec2((x + 0.5) / uSize.x, (y + 0.5) / uSize.y)).a;',
+      '  gl_FragColor = vec4(1.0, 1.0, 236.0 / 255.0, min(v, 1.0) * m);',
+      '}'
+    ].join('\n'));
+    if (!vs || !fs) return;
+    var pr = gl.createProgram();
+    gl.attachShader(pr, vs); gl.attachShader(pr, fs); gl.linkProgram(pr);
+    if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) return;
+    gl.useProgram(pr);
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    var ap = gl.getAttribLocation(pr, 'aPos');
+    gl.enableVertexAttribArray(ap);
+    gl.vertexAttribPointer(ap, 2, gl.FLOAT, false, 0, 0);
+    glTex = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, glTex);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    glU = { time: gl.getUniformLocation(pr, 'uTime'), scale: gl.getUniformLocation(pr, 'uScale'), size: gl.getUniformLocation(pr, 'uSize') };
+    gl.uniform1i(gl.getUniformLocation(pr, 'uMask'), 0);
+    gpuCaus = true;
+  })();
+  function renderCausticsGL(time) {
+    gl.uniform1f(glU.time, time);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+  }
+  glCv.addEventListener('webglcontextlost', function (e) { e.preventDefault(); gpuCaus = false; paintCaustics(T * 0.42 + 3.1); });
 
   /* ---------- koi ---------- */
   var NSEG = 14;
@@ -1634,7 +1728,7 @@
     /* caustic light plays over floor and backs alike */
     c.globalCompositeOperation = 'lighter';
     c.globalAlpha = 0.58;
-    c.drawImage(causCv, 0, 0, W, H);
+    c.drawImage(gpuCaus ? glCv : causCv, 0, 0, W, H);
     c.globalCompositeOperation = 'source-over';
     c.globalAlpha = 1;
 
@@ -1648,7 +1742,10 @@
     for (i = 0; i < pads.length; i++) drawPad(pads[i]);
     for (i = 0; i < striders.length; i++) drawStrider(striders[i]);
     drawPellets();
-    c.drawImage(stoneCv, 0, 0, W, H);
+    for (i = 0; i < stoneRects.length; i++) {
+      var sr = stoneRects[i];
+      c.drawImage(stoneCv, sr.x * DPR, sr.y * DPR, sr.w * DPR, sr.h * DPR, sr.x, sr.y, sr.w, sr.h);
+    }
 
     if (fly) {
       var fs = 1.7 * Math.max(0.72, S);
@@ -1674,12 +1771,14 @@
 
   function frame(now) {
     raf = requestAnimationFrame(frame);
+    if (covered && (++coverSkip & 1)) return;
     var dt = Math.min(0.05, (now - last) / 1000);
     last = now;
     if (dt <= 0) return;
     T += dt; frameN++;
     update(dt);
-    if (!calm && frameN % 3 === 0) paintCaustics(T * 0.42 + 3.1);
+    if (gpuCaus) { if (!calm && !covered) renderCausticsGL(T * 0.42 + 3.1); }
+    else if (!calm && !covered && frameN % 3 === 0) paintCaustics(T * 0.42 + 3.1);
     render();
   }
 
@@ -1716,7 +1815,8 @@
     if (document.hidden) { cancelAnimationFrame(raf); raf = 0; }
     else if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); }
   });
-  function motionChanged() { calm = mq.matches; if (calm) paintCaustics(3.1); }
+  document.addEventListener('pond:cover', function (e) { covered = !!e.detail.covered; });
+  function motionChanged() { calm = mq.matches; if (calm) { if (gpuCaus) renderCausticsGL(3.1); else paintCaustics(3.1); } }
   if (mq.addEventListener) mq.addEventListener('change', motionChanged);
   else if (mq.addListener) mq.addListener(motionChanged);
 
@@ -1740,7 +1840,7 @@
 
   var me = document.getElementById('me'), caption = document.getElementById('caption');
   var veil = document.getElementById('veil'), bio = document.getElementById('bio'), back = document.getElementById('back');
-  var p = 0, anim = 0, wasOpen = false;
+  var p = 0, anim = 0, wasOpen = false, wasCovered = null;
 
   function apply(v) {
     p = v;
@@ -1754,6 +1854,13 @@
     bio.style.transform = 'translate(-50%, ' + (-46 + (1 - e) * 6) + '%)';
     bio.style.pointerEvents = open ? 'auto' : 'none';
     me.style.visibility = e > 0.98 ? 'hidden' : '';
+    /* tell the pond when the bio covers it, so it can idle at half rate */
+    var covered = e >= 0.98;
+    if (covered !== wasCovered) {
+      wasCovered = covered;
+      root.dataset.pondCovered = covered ? '1' : '0';
+      document.dispatchEvent(new CustomEvent('pond:cover', { detail: { covered: covered } }));
+    }
     if (open !== wasOpen) {
       wasOpen = open;
       me.setAttribute('aria-expanded', open ? 'true' : 'false');

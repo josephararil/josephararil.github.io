@@ -7,7 +7,8 @@ noon, with a short bio just beneath the surface.
 
 A single self-contained `index.html` (no build, no dependencies). The pond is the "Koi Pond, Noon"
 study written by Claude Fable 5.2 (from the MiaAI-Lab collection of Fable 5.2 HTML pages), used
-with its simulation untouched. On top of it sits a thin personal layer:
+with its look and feel unchanged (see [Changes from the original](#changes-from-the-original)).
+On top of it sits a thin personal layer:
 
 - **Signature caption.** The vertical caption in the bottom-right corner reads
   "Joseph Harari · koi pond, noon." Clicking it opens the bio.
@@ -17,6 +18,17 @@ with its simulation untouched. On top of it sits a thin personal layer:
   - Touch devices (`(hover: none) and (pointer: coarse)`): no scrolling, because a vertical swipe
     would fight tap-for-ripple and hold-to-feed. The JH button plays the same reveal as a tween.
   - Close it with "back to the pond", a click on the veil, Escape, or by scrolling back up.
+
+## Changes from the original
+
+- **GPU caustics.** The caustic light is drawn by a WebGL fragment shader every frame, with the same
+  maths at the same resolution. The original CPU version (every third frame) stays as the fallback
+  when WebGL is unavailable or the context is lost.
+- **Stones drawn only in the corners.** The stone layer is copied as four corner rectangles instead
+  of a full-screen image. No visual change.
+- **Half rate behind the bio.** While the bio covers the pond, the pond runs every other frame and
+  the caustics freeze. The personal layer signals this with `data-pond-covered` on `<html>` and a
+  `pond:cover` event.
 
 ## Files
 
