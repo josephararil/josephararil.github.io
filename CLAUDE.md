@@ -5,7 +5,11 @@ Personal homepage for josepharari.com, served by GitHub Pages from `main` (repo
 
 - The whole site is `index.html`. No build step, no dependencies, no external requests.
 - The first `<script>` block is the koi pond simulation from Claude Fable 5.2's "Koi Pond, Noon".
-  Keep it byte-for-byte as it is unless the task is to change the pond itself.
+  Changes to the pond are deliberate and listed in README → Changes from the original. Keep the look
+  and feel unless a task says otherwise.
+- Caustics render on the GPU (a WebGL fragment shader, `renderCausticsGL`) every frame. The CPU
+  `paintCaustics` is the reference and the fallback when WebGL is missing or the context is lost;
+  keep the two in step if you change the maths.
 - The personal layer (caption, JH button, veil, bio) lives in: the CSS after the
   `the personal layer` comment, the markup for `#me`, `#veil`, `#bio`, `.depth`, and the second
   `<script>` block.
