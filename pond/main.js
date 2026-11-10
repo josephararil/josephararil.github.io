@@ -3,7 +3,7 @@
 // main.js is the entry point and nothing imports it, so its startup at the bottom runs after every
 // other module has finished loading.
 
-import { TAU, clamp, C, cv, ctx, mq, W, H, DPR, S, T, calm, covered, setView, advanceTime, setCalm, setCovered } from './core.js';
+import { TAU, clamp, C, CONFIG, cv, ctx, mq, W, H, DPR, S, T, calm, covered, setView, advanceTime, setCalm, setCovered } from './core.js';
 import { depthAt, buildFloor, stepCaustics, refreshCausticsStill, drawFloor, drawCaustics, drawStones } from './floor.js';
 import { NSEG, fish, makeFish, updateFish, poseFish, drawFish, drawFishShadow } from './koi.js';
 import { pads, leaves, striders, fly, pellets, ripples, buildPads, updatePads, padPath, drawPad, buildLeaves, leafPath, drawLeaf, updateLeaves, buildStriders, updateStriders, striderFoot, drawStrider, updateFly, flyShape, updateSurface, drawRipples, drawPellets } from './surface.js';
@@ -66,7 +66,7 @@ function render() {
   for (i = 0; i < fish.length; i++) drawFish(fish[i]);
 
   /* caustic light plays over floor and backs alike */
-  drawCaustics(c, 0.58);
+  drawCaustics(c, CONFIG.causticAlpha);
 
   /* a broad sheet of noon light on the surface */
   var sg = c.createLinearGradient(0, 0, W * 0.75, H);
@@ -122,7 +122,7 @@ function resize() {
   buildFloor();
   buildPads(); buildLeaves(); buildStriders();
   if (first) {
-    var n = clamp(Math.round(W * H / 100000), 9, 13);
+    var n = clamp(Math.round(W * H / 100000), CONFIG.fishMin, CONFIG.fishMax);
     for (var i = 0; i < n; i++) fish.push(makeFish(i, n));
     for (i = 0; i < fish.length; i++) poseFish(fish[i]);
   } else {
@@ -152,3 +152,6 @@ else if (mq.addListener) mq.addListener(motionChanged);
 initInput(); initSound(); resize();
 last = performance.now();
 raf = requestAnimationFrame(frame);
+
+/* ?debug in the URL loads a live readout; visitors never download it */
+if (new URLSearchParams(location.search).has('debug')) import('./debug.js').then(function (m) { m.start(); });

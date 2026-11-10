@@ -1,7 +1,7 @@
 // Part of the koi pond. Moved verbatim from the original single script; see README.
 // Rule: never call an imported function or read an imported mutable binding at top level, only inside functions.
 
-import { TAU, rngf, rnd, lerp, angd, mix, C, ctx, W, H, S, T, calm } from './core.js';
+import { TAU, rngf, rnd, lerp, angd, mix, C, CONFIG, ctx, W, H, S, T, calm } from './core.js';
 import { stones, onStone } from './floor.js';
 import { fish, school } from './koi.js';
 import { plip } from './sound.js';
@@ -306,7 +306,7 @@ function flyShape(c, x, y, a, sc, shadow) {
 /* ---------- ripples, pellets ---------- */
 var pellets = [], ripples = [], ripId = 0;
 function addRipple(x, y, str, maxR, small, delay) {
-  if (ripples.length > 46) ripples.shift();
+  if (ripples.length > CONFIG.maxRipples) ripples.shift();
   ripples.push({ id: ++ripId, x: x, y: y, t: -(delay || 0), str: str, maxR: maxR, sp: (small ? 34 : 92) * S * (calm ? 0.5 : 1), rings: small ? 2 : 4, gap: (small ? 6 : 17) * S, small: !!small });
 }
 function tapWater(x, y) {

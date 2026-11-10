@@ -52,6 +52,13 @@ var C = {
   black: '#1B1B1B', yolk: '#F2B33D', padA: '#3E8E5A', padB: '#6DB37C', lotus: '#F7C6D0'
 };
 
+/* tunable numbers, one place to change them */
+var CONFIG = {
+  fishMin: 9, fishMax: 13,          // count = clamp(round(W*H/100000), fishMin, fishMax)
+  causticAlpha: 0.58,               // c.globalAlpha for the caustics composite
+  maxRipples: 46                    // live ripples kept before the oldest is dropped
+};
+
 /* the only writers of the shared view, clock and mode bindings */
 function setView(w, h, dpr) {
   W = w; H = h; DPR = dpr;
@@ -61,4 +68,4 @@ function setView(w, h, dpr) {
 function advanceTime(dt) { T += dt; }
 function setCalm(b) { calm = b; }
 function setCovered(b) { covered = b; }
-export { TAU, rngf, rnd, clamp, lerp, hex, mix, angd, smooth, C, cv, ctx, mq, W, H, DPR, S, M, T, calm, covered, setView, advanceTime, setCalm, setCovered };
+export { TAU, rngf, rnd, clamp, lerp, hex, mix, angd, smooth, C, CONFIG, cv, ctx, mq, W, H, DPR, S, M, T, calm, covered, setView, advanceTime, setCalm, setCovered };
