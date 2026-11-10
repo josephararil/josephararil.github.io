@@ -1,7 +1,7 @@
 // Part of the koi pond. Moved verbatim from the original single script; see README.
 // Rule: never call an imported function or read an imported mutable binding at top level, only inside functions.
 
-import { TAU, rngf, rnd, lerp, angd, mix, C, CONFIG, ctx, W, H, S, T, calm } from './core.js';
+import { TAU, rngf, rnd, clamp, lerp, angd, mix, C, CONFIG, ctx, W, H, S, T, calm } from './core.js';
 import { stones, onStone } from './floor.js';
 import { fish, school } from './koi.js';
 import { plip } from './sound.js';
@@ -379,6 +379,8 @@ function updateSurface(dt) {
     if (pl.t > 0) {
       pl.age += dt;
       pl.x += pl.vx * dt; pl.y += pl.vy * dt; pl.vx *= 1 - dt * 0.8; pl.vy *= 1 - dt * 0.8;
+      /* the bank stops food drifting out of reach: past the edge no fish can get it, and they all knot there */
+      pl.x = clamp(pl.x, 8, W - 8); pl.y = clamp(pl.y, 8, H - 8);
       /* fish jostling pushes the pellets about */
       for (k = 0; k < fish.length; k++) {
         var f = fish[k]; d = Math.hypot(pl.x - f.x, pl.y - f.y);
