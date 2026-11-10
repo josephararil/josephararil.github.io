@@ -43,4 +43,5 @@ Then open http://localhost:8766.
 ## History
 
 Until November 2026 this repo held a GitHub-repo card index (`app.js`, `styles.css`, `screens/`).
-It is in the git history if it's ever wanted at `/apps`.
+Its last, curated version (with `headless`/`runtimeNote` entries, the Automations category and
+`EXCLUDED_REPOS`) is commit `f30a9a0`, if it's ever wanted back at `/apps`.
