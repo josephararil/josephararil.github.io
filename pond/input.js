@@ -1,10 +1,11 @@
 // Part of the koi pond. Moved verbatim from the original single script; see README.
 // Rule: never call an imported function or read an imported mutable binding at top level, only inside functions.
 
-import { TAU, rnd, clamp, cv, ctx, W, H, S } from './core.js';
+import { TAU, rnd, clamp, CONFIG, cv, ctx, W, H, S } from './core.js';
 import { onStone } from './floor.js';
 import { fish, school, VARIETY, WORDS } from './koi.js';
-import { pellets, tapWater, feed } from './surface.js';
+import { pellets, tapWater, feed, addWake } from './surface.js';
+import { plip, isSoundOn } from './sound.js';
 
 /* ---------- pointer ---------- */
 var ptr = { x: -999, y: -999, inside: false, mouse: false, down: false, dx: 0, dy: 0, dt: 0, held: false, spd: 0, slowT: 0, lx: 0, ly: 0, moved: 0, id: -1 };
@@ -54,6 +55,7 @@ function release(e, cancelled) {
   }
 }
 
+var drag = { on: false, x: 0, y: 0, n: 0 };
 function updatePointer(dt) {
   var inst = ptr.moved / Math.max(dt, 0.001); ptr.moved = 0;
   ptr.spd += (inst - ptr.spd) * Math.min(1, dt * 6);
@@ -61,6 +63,23 @@ function updatePointer(dt) {
     if (Math.hypot(ptr.x - ptr.dx, ptr.y - ptr.dy) > 12 * Math.max(1, S)) ptr.dt = -99;
     else ptr.dt += dt;
     if (ptr.dt >= HOLD) { ptr.held = true; doFeed(ptr.dx, ptr.dy); }
+  }
+  /* dragging across the water leaves a wake: a ring every CONFIG.wake.spacing px behind the pointer */
+  if (!ptr.down) drag.on = false;
+  else {
+    if (!ptr.held && !drag.on && Math.hypot(ptr.x - ptr.dx, ptr.y - ptr.dy) > 12 * Math.max(1, S)) {
+      drag.on = true; drag.x = ptr.dx; drag.y = ptr.dy;
+      addWake(drag.x, drag.y);
+    }
+    if (drag.on) {
+      var step = CONFIG.wake.spacing * S, wn = 0, wd = Math.hypot(ptr.x - drag.x, ptr.y - drag.y);
+      while (wd >= step && wn < CONFIG.wake.maxPerFrame) {
+        drag.x += (ptr.x - drag.x) / wd * step; drag.y += (ptr.y - drag.y) / wd * step;
+        addWake(drag.x, drag.y); wn++;
+        if (++drag.n % 3 === 0 && isSoundOn()) plip(0.03, 420 + Math.random() * 160);
+        wd = Math.hypot(ptr.x - drag.x, ptr.y - drag.y);
+      }
+    }
   }
   /* a slow pointer draws the nearest curious fish */
   var active = ptr.inside && (ptr.mouse || ptr.down) && !pellets.length && !onStone(ptr.x, ptr.y);
