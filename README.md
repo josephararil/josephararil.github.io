@@ -1,39 +1,47 @@
 # josepharari.com — homepage
 
-The live personal app index at [josepharari.com](https://josepharari.com).
+The personal homepage at [josepharari.com](https://josepharari.com): a koi pond seen from above at
+noon, with a short bio just beneath the surface.
 
 ## What it is
 
-A single-page app that fetches Joseph Harari's public GitHub repos and renders them as a
-browsable, searchable card grid. Curated metadata (tagline, description, highlights,
-gradient artwork, glyph) lives in `app.js`.
+A single self-contained `index.html` (no build, no dependencies). The pond is the "Koi Pond, Noon"
+study written by Claude Fable 5.2 (from the MiaAI-Lab collection of Fable 5.2 HTML pages), used
+with its simulation untouched. On top of it sits a thin personal layer:
+
+- **Signature caption.** The vertical caption in the bottom-right corner reads
+  "Joseph Harari · koi pond, noon." Clicking it opens the bio.
+- **JH button**, top-left, mirroring the sound button top-right, with "a little about me" beside it.
+- **The bio.** It surfaces through a white glare, the same effect the page opens with.
+  - Desktop: the page scrolls one screen. The pond stays fixed and scroll position drives the reveal.
+  - Touch devices (`(hover: none) and (pointer: coarse)`): no scrolling, because a vertical swipe
+    would fight tap-for-ripple and hold-to-feed. The JH button plays the same reveal as a tween.
+  - Close it with "back to the pond", a click on the veil, Escape, or by scrolling back up.
 
 ## Files
 
 | File | What |
 |------|------|
-| `index.html` | Page shell |
-| `styles.css` | Self-contained stylesheet — design tokens + all page-specific styles |
-| `app.js` | Data layer, rendering, and interactions |
-| `screens/` | App screenshots (referenced by `app.js`) |
+| `index.html` | The whole site |
+| `CNAME` | GitHub Pages custom domain |
 
-## Design system
+## Editing the bio
 
-The visual language is **Aperture** — see [github.com/josephararil/aperture](https://github.com/josephararil/aperture).
-This repo keeps a self-contained copy of the design tokens inside `styles.css`
-(no runtime dependency on the Aperture repo).
+The bio is plain HTML in the `<section class="bio">` block near the bottom of `index.html`.
+The personal-layer CSS is under the `the personal layer` comment, and its JS is the second
+`<script>` block. Leave the first `<script>` (the pond simulation) alone unless you mean to
+change the pond.
 
-## Adding a new app
+## Running locally
 
-1. Push a public repo to [github.com/josephararil](https://github.com/josephararil) — it appears automatically.
-2. Add a curated entry to `APPS` in `app.js` for a polished tagline, description, gradient, and glyph.
-3. Drop a screenshot at `screens/<repo-name>.png` and set `shot:` in the `APPS` entry.
-4. If the repo has no live GitHub Pages deployment (a GitHub Actions pipeline, a CLI, a data-only
-   repo, a design prototype not yet deployed), set `headless: true` and a short `runtimeNote:`
-   (e.g. `"Runs daily on GitHub Actions — no UI, just email"`). The card's "Launch app" button is
-   hidden and the note is shown in its place in the detail modal.
+```bash
+python -m http.server 8766
+```
 
-## Excluding a repo
+Then open http://localhost:8766.
 
-Repos that are empty, superseded, or otherwise not ready for public display can be added to
-`EXCLUDED_REPOS` in `app.js` rather than deleted from GitHub.
+## History
+
+Until November 2026 this repo held a GitHub-repo card index (`app.js`, `styles.css`, `screens/`).
+Its last, curated version (with `headless`/`runtimeNote` entries, the Automations category and
+`EXCLUDED_REPOS`) is commit `f30a9a0`, if it's ever wanted back at `/apps`.
