@@ -9,6 +9,8 @@ import { NSEG, fish, makeFish, updateFish, poseFish, drawFish, drawFishShadow } 
 import { pads, leaves, striders, fly, pellets, ripples, buildPads, updatePads, padPath, drawPad, buildLeaves, leafPath, drawLeaf, updateLeaves, buildStriders, updateStriders, striderFoot, drawStrider, updateFly, flyShape, updateSurface, drawRipples, drawPellets } from './surface.js';
 import { initInput, updatePointer, drawPointer } from './input.js';
 import { initSound, updateSound } from './sound.js';
+import { initRain, updateRain, rainLevel } from './rain.js';
+import { initIntro } from './intro.js';
 
 var last = 0, raf = 0, frameN = 0, coverSkip = 0;
 var shCv = document.createElement('canvas');
@@ -23,6 +25,7 @@ function update(dt) {
   for (i = 0; i < fish.length; i++) poseFish(fish[i]);
   updatePads(dt); updateLeaves(dt); updateStriders(dt); updateFly(dt); updateSurface(dt);
   updateSound(dt);
+  updateRain(dt);
 }
 
 function render() {
@@ -66,11 +69,12 @@ function render() {
   for (i = 0; i < fish.length; i++) drawFish(fish[i]);
 
   /* caustic light plays over floor and backs alike */
-  drawCaustics(c, CONFIG.causticAlpha);
+  drawCaustics(c, CONFIG.causticAlpha * (1 - CONFIG.rain.dimCaustics * rainLevel()));
 
-  /* a broad sheet of noon light on the surface */
+  /* a broad sheet of noon light on the surface (dimmer under rain) */
+  var lit = 1 - CONFIG.rain.dimLight * rainLevel();
   var sg = c.createLinearGradient(0, 0, W * 0.75, H);
-  sg.addColorStop(0, 'rgba(255,255,255,.2)'); sg.addColorStop(0.45, 'rgba(255,255,255,.03)'); sg.addColorStop(1, 'rgba(255,255,255,0)');
+  sg.addColorStop(0, 'rgba(255,255,255,' + (0.2 * lit) + ')'); sg.addColorStop(0.45, 'rgba(255,255,255,' + (0.03 * lit) + ')'); sg.addColorStop(1, 'rgba(255,255,255,0)');
   c.fillStyle = sg; c.fillRect(0, 0, W, H);
 
   drawRipples();
@@ -149,7 +153,7 @@ function motionChanged() { setCalm(mq.matches); if (calm) refreshCausticsStill()
 if (mq.addEventListener) mq.addEventListener('change', motionChanged);
 else if (mq.addListener) mq.addListener(motionChanged);
 
-initInput(); initSound(); resize();
+initInput(); initSound(); initRain(); initIntro(); resize();
 last = performance.now();
 raf = requestAnimationFrame(frame);
 

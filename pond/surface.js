@@ -309,6 +309,12 @@ function addRipple(x, y, str, maxR, small, delay) {
   if (ripples.length > CONFIG.maxRipples) ripples.shift();
   ripples.push({ id: ++ripId, x: x, y: y, t: -(delay || 0), str: str, maxR: maxR, sp: (small ? 34 : 92) * S * (calm ? 0.5 : 1), rings: small ? 2 : 4, gap: (small ? 6 : 17) * S, small: !!small });
 }
+/* one ring of a drag wake: the shape addRipple builds, sized from CONFIG.wake; it nudges pads and leaves but startles no fish */
+function addWake(x, y) {
+  if (onStone(x, y)) return;
+  if (ripples.length > CONFIG.maxRipples) ripples.shift();
+  ripples.push({ id: ++ripId, x: x, y: y, t: 0, str: CONFIG.wake.str, maxR: CONFIG.wake.maxR * S, sp: CONFIG.wake.speed * S * (calm ? 0.5 : 1), rings: CONFIG.wake.rings, gap: CONFIG.wake.gap * S, small: false });
+}
 function tapWater(x, y) {
   if (onStone(x, y)) return false;
   addRipple(x, y, calm ? 0.7 : 1, 240 * S, false);
@@ -436,4 +442,4 @@ function drawPellets() {
   }
 }
 
-export { pads, leaves, striders, fly, pellets, ripples, buildPads, updatePads, padPath, drawPad, drawLotus, buildLeaves, leafPath, drawLeaf, updateLeaves, buildStriders, updateStriders, striderFoot, drawStrider, updateFly, flyShape, addRipple, tapWater, feed, updateSurface, drawRipples, drawPellets };
+export { pads, leaves, striders, fly, pellets, ripples, buildPads, updatePads, padPath, drawPad, drawLotus, buildLeaves, leafPath, drawLeaf, updateLeaves, buildStriders, updateStriders, striderFoot, drawStrider, updateFly, flyShape, addRipple, addWake, tapWater, feed, updateSurface, drawRipples, drawPellets };

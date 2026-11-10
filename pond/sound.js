@@ -4,6 +4,7 @@
 /* ---------- sound: off until asked for ---------- */
 var ac = null, master = null, noiseBuf = null, soundOn = false, trickle = 0;
 var soundBtn = document.getElementById('sound'), soundLbl = document.getElementById('soundLbl');
+var rainGain = null, rainWant = 0, rainSet = -1;
 function initAudio() {
   var AC = window.AudioContext || window.webkitAudioContext;
   if (!AC) return false;
@@ -24,7 +25,22 @@ function initAudio() {
   lfo.connect(lg); lg.connect(bp.frequency); lfo2.connect(lg2); lg2.connect(g.gain);
   src.connect(bp); bp.connect(hp); hp.connect(g); g.connect(master);
   src.start(); lfo.start(); lfo2.start();
+  /* rain hiss: the same noise, higher and brighter, silent until it rains */
+  var rs = ac.createBufferSource(); rs.buffer = noiseBuf; rs.loop = true;
+  var rhp = ac.createBiquadFilter(); rhp.type = 'highpass'; rhp.frequency.value = 1200;
+  var rbp = ac.createBiquadFilter(); rbp.type = 'bandpass'; rbp.frequency.value = 3000; rbp.Q.value = 0.5;
+  rainGain = ac.createGain(); rainGain.gain.value = 0;
+  rs.connect(rhp); rhp.connect(rbp); rbp.connect(rainGain); rainGain.connect(master);
+  rs.start();
+  rainSet = -1; setRainLevel(rainWant);
   return true;
+}
+/* x in 0..1; remembered until the audio exists. Small changes are skipped so a steady level adds no automation events. */
+function setRainLevel(x) {
+  rainWant = x;
+  if (!rainGain || x === rainSet || (Math.abs(x - rainSet) < 0.01 && x > 0 && x < 1)) return;
+  rainSet = x;
+  rainGain.gain.setTargetAtTime(0.06 * x, ac.currentTime, 0.4);
 }
 function plip(vol, base) {
   if (!soundOn || !ac) return;
@@ -64,4 +80,4 @@ function updateSound(dt) {
   }
 }
 
-export { plip, isSoundOn, initSound, updateSound };
+export { plip, isSoundOn, initSound, updateSound, setRainLevel };

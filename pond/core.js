@@ -56,7 +56,12 @@ var C = {
 var CONFIG = {
   fishMin: 9, fishMax: 13,          // count = clamp(round(W*H/100000), fishMin, fishMax)
   causticAlpha: 0.58,               // c.globalAlpha for the caustics composite
-  maxRipples: 46                    // live ripples kept before the oldest is dropped
+  maxRipples: 90,                   // live ripples kept before the oldest is dropped (rain needs room)
+  /* rain: dry spells and showers in seconds (about 10% of the time wet), fades, drops, how much it dims the light */
+  rain: { dryMin: 120, dryMax: 240, wetMin: 14, wetMax: 26, startChance: 0.1,
+          rampUp: 3, rampDown: 4, dropsPerSec: 28, dimCaustics: 0.55, dimLight: 0.6 },
+  /* drag wake: px between rings, cap per frame, strength, size, speed (px/s), rings, ring gap; px are times S */
+  wake: { spacing: 22, maxPerFrame: 6, str: 0.55, maxR: 64, speed: 58, rings: 2, gap: 9 }
 };
 
 /* the only writers of the shared view, clock and mode bindings */
