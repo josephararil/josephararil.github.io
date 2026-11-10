@@ -20,6 +20,12 @@ Personal homepage for josepharari.com, served by GitHub Pages from `main` (repo
   - **SINGLE-WRITER:** a shared binding is assigned only in its own module. `W H DPR S M T calm
     covered` change only through `setView`, `advanceTime`, `setCalm`, `setCovered` in `core.js`.
     Assigning an imported binding throws, but only when that line runs.
+- Rain timing uses `Math.random()`, never the seeded `rnd()`: `rnd` is seeded, so rain would start
+  at the same moment on every visit.
+- The intro card shows once per browser: `localStorage` key `pond.introSeen.v1` (bump the suffix to
+  show a changed card again). All storage access is wrapped in try/catch.
+- The photo is `me.png` in the repo root (the owner's GitHub avatar, saved locally so there is no
+  external request). The JH disc falls back to the text "JH" if it fails to load.
 - Tunable numbers live in `CONFIG` (`pond/core.js`). `?debug` loads `pond/debug.js`: a live panel,
   `D` logs a JSON state dump, and `window.__pond` exposes the arrays.
 - The personal layer (caption, JH button, veil, bio) lives in: the CSS after the
