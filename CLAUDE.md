@@ -36,5 +36,10 @@ Personal homepage for josepharari.com, served by GitHub Pages from `main` (repo
   in the browser pane use the mobile preset, which emulates a coarse pointer.
 - Visual language: Georgia italic, ink `#14323A` at 70%, the pond palette in `:root`. Light only,
   by design. Do not add a credit line (owner's call).
+- **Offline PWA.** `sw.js` pre-caches a fixed file list and serves it cache-first. On any change
+  to a deployed file, bump `CACHE` in `sw.js` in the same PR, and add new files to `FILES`;
+  otherwise visitors never see the change. The installed app (`display: fullscreen`) must behave
+  exactly like the site. The worker skips `localhost` unless the URL has `?sw`; unregister it
+  after testing.
 - Preview: `python -m http.server 8766` from the repo root. It needs http: ES modules do not load
   from `file://`.
