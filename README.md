@@ -35,6 +35,29 @@ On top of it sits a thin personal layer:
 - **Drag wakes.** Dragging across the water leaves a trail of medium ripples. Wakes nudge pads and
   leaves but do not startle the fish; a slow drag can still draw a curious koi to follow.
 
+## Installable and offline
+
+The site is a PWA. Chrome and Edge (desktop and Android) offer to install it; on iOS it is Share →
+Add to Home Screen. Installed, it opens as "Koi Pond", full screen, and runs with no network.
+
+- `manifest.webmanifest` sets `display: fullscreen` and the icons. iOS ignores `fullscreen`, so
+  `index.html` also sets `apple-mobile-web-app-capable` and a `black-translucent` status bar
+  (the pond draws under it, with `viewport-fit=cover`).
+- `sw.js` caches every file on its first visit and serves them all cache-first. It caches nothing
+  else at run time, so the file list in `sw.js` must name every file the site loads.
+- The installed app behaves the same as the website. Only the GitHub, LinkedIn and email links
+  need a network.
+- Icons in `icons/` are the favicon's koi disc drawn as PNGs. The maskable icon keeps the koi in
+  the centre 80% so launchers can crop it to any shape.
+
+**Deploying a change:** bump `CACHE` at the top of `sw.js` (`pond-v1` → `pond-v2`) in the same
+commit, and add any new file to `FILES`. Without the bump, visitors keep the old version. With it,
+the new version downloads on the next visit and shows on the visit after.
+
+The worker does not register on `localhost` (it would serve stale files while editing). Add `?sw`
+to the URL to test it locally, and unregister it afterwards (DevTools → Application → Service
+workers).
+
 ## Changes from the original
 
 - **GPU caustics.** The caustic light is drawn by a WebGL fragment shader every frame, with the same
@@ -75,6 +98,9 @@ On top of it sits a thin personal layer:
 | `index.html` | Markup, CSS, and the personal-layer script (caption, JH button, bio) |
 | `pond/` | The koi pond, as native ES modules (table below) |
 | `me.png` | The photo in the JH disc and the bio |
+| `sw.js` | Service worker: caches the site for offline use (bump `CACHE` on every deploy) |
+| `manifest.webmanifest` | PWA manifest: name, full screen, icons |
+| `icons/` | App icons (192, 512, maskable 512, Apple touch 180) |
 | `CNAME` | GitHub Pages custom domain |
 
 ### `pond/`
